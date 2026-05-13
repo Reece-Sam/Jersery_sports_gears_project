@@ -3,11 +3,7 @@ from flasgger import Swagger
 from extensions import db
 from dotenv import load_dotenv
 from flask_cors import CORS
-
-# Import new models
 from models import User, Product, Cart, CartItem, Order, OrderItem
-
-# Import new routes
 from routes.user import user_bp
 from routes.product import product_bp
 from routes.cart import cart_bp
@@ -18,14 +14,12 @@ import os
 load_dotenv()
 app = Flask(__name__)
 
-# Enable CORS
 CORS(app)
 
 # Database config
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Optional but important for auth later
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'super-secret-key')
 
 db.init_app(app)
@@ -48,7 +42,7 @@ with app.app_context():
 
 @app.route('/')
 def home():
-    return "Sports Store API Running 🚀"
+    return "Sports Store API Running "
 
 
 if __name__ == "__main__":

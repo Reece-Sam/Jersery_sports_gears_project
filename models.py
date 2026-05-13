@@ -26,3 +26,95 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User: {self.email}>'
+    
+
+class Product(db.Model):
+    __tablename__ = "products"
+
+    id = db.Column(db.Integer, primary_key = True)
+    created_at = db.Column(
+        db.DateTime,
+        server_default = func.now(),
+        nullable = False 
+    )
+
+    name = db.Column(db.String(150), nullable = False)
+    description = db.Column(db.Text)
+    price = db.Column(db.Numeric(10,2), nullable = False)
+    stock = db.Column(db.Integer, default = 0)
+    
+    category = db.Column(db.String(100), nullable = False)
+    image_url = db.Column(db.String(255))
+
+    def __repr__(self):
+        return f'<Product: {self.name}>'
+    
+
+class Order(db.Model):
+    __tablename__ = "orders"
+
+    id = db.Column(db.Integer, primary_key = True)
+
+    created_at = db.Column(
+        db.DateTime, 
+        server_default = func.now(),
+        nullable = False 
+    )
+
+    updated_at = db.Column(
+        db.DateTime,
+        server_default = func.now(),
+        onupdate = func.now(),
+        nullable = False
+    )
+
+    total_price = db.Column(db.Numeric(10, 2), nullable=False)
+    status = db.Column(db.String(50), default="pending")
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user = db.relationship('User', backref='orders')
+
+
+class OrderItem(db.Model):
+    __tablename__ = "order_items"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+
+    quantity = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Numeric(10, 2), nullable=False)
+
+    order = db.relationship('Order', backref='item')
+    product = db.relationship('Product')
+
+
+class Cart(db.Model):
+    __tablename__ = "carts"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=func.now(),
+        nullable=False
+    )
+
+    user = db.relationship('User', backref='cart')
+
+
+class CartItem(db.Model):
+    __tablename__ = "cart_items"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    cart_id = db.Column(db.Integer, db.ForeignKey('carts.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+
+    quantity = db.Column(db.Integer, nullable=False, default=1)
+
+    cart = db.relationship("Cart", backref="items")
+    product = db.relationship('Product')
+
+    
