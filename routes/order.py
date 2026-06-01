@@ -151,4 +151,95 @@ def get_order(id):
         }), 500
     
 
+@order_bp.route('/orders/<int:id>/cancel', methods = ['PATCH'])
+def cancel_order(id):
+    try:
+        order = db.session.get(Order, id)
 
+        if not order:
+            return jsonify({
+               "status" : "error",
+               "message" : "Order not found"
+            }), 404
+    
+        if order.status == "cancelled":
+            return jsonify({
+              "status" : "error",
+              "message" : "Already Cancelled"
+            }), 400
+    
+        for item in order.items:
+            item.product.stock += item.quantity
+
+        order.status = "cancelled"
+
+        db.session.commit()
+
+        return jsonify({
+            "status" : "success",
+            "message" : "Order Cancelled"
+        }), 200
+    
+    except Exception as e:
+        return jsonify({
+            "status" : "error",
+            "message" : str(e)
+        }), 500
+
+
+@order_bp.route('orders/<int:id>', methods = ['PATCH', 'PUT'])
+def update_order(id):
+    try:
+        order = db.session.get(Order, id)
+
+        if not order:
+            return jsonify({
+                "status" : "error",
+                "message" : "Order not found"
+            }), 404
+        
+        data = request.get_json()
+
+        if 'status' in data:
+            order.status = data['status']
+
+        db.session.commit()
+
+        return jsonify({
+            "status" : "success",
+            "message" : "Order updated successfully",
+            "order_id" : order.id,
+            "status" : order.status
+        }), 200
+    
+    except Exception as e:
+        return jsonify({
+            "status" : "error",
+            "message" : str(e)
+        }), 500
+
+
+@order_bp.route('orders/<int:id>', methods = ['DELETE'])
+def delete_order(id):
+    try: 
+        order = db.session.get(Order, id)
+
+        if not order:
+            return jsonify({
+                "status" : "error",
+                "message" : "Order not found"
+            }), 404
+        
+        db.session.delete(order)
+        db.session.commit()
+
+        return jsonify({
+            "status" : "success",
+            "message" : "Order deleted successfully"
+        }), 200
+    
+    except Exception as e: 
+        return jsonify({
+            "status" : "error",
+            "message" : str(e)
+        }), 500
