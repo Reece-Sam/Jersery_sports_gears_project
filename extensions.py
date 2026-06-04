@@ -1,6 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail
 
 db = SQLAlchemy()
+mail = Mail()
 
 # Better connection handling (important for production / PostgreSQL)
 SQLALCHEMY_ENGINE_OPTIONS = {

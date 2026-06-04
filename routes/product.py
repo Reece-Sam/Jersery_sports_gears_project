@@ -4,7 +4,7 @@ from models import Product
 
 product_bp = Blueprint('product_bp', __name__)
 
-@product_bp.route('/products', methods=['POST'])
+@product_bp.route('/', methods=['POST'])
 def create_product():
 
     try:
@@ -46,7 +46,7 @@ def create_product():
         }), 500
 
 
-@product_bp.route('/products', methods=['GET'])
+@product_bp.route('/', methods=['GET'])
 def get_products():
 
     try:

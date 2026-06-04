@@ -4,7 +4,7 @@ from models import Cart, CartItem, Product, User
 
 cart_bp = Blueprint('cart_bp', __name__)
 
-@cart_bp.route('/cart/<int:user_id>', methods = ['GET'])
+@cart_bp.route('/<int:user_id>', methods = ['GET'])
 def get_cart(user_id):
 
     try:
@@ -46,7 +46,7 @@ def get_cart(user_id):
         }), 500
     
 
-@cart_bp.route('cart/add', methods = ['POST'])
+@cart_bp.route('/add', methods = ['POST'])
 def add_to_cart():
     try:
 
@@ -118,7 +118,7 @@ def add_to_cart():
         }), 500
     
 
-@cart_bp.route('/cart/item/<int:item_id>', methods = ['DELETE'])
+@cart_bp.route('/carts/item/<int:item_id>', methods = ['DELETE'])
 def remove_from_cart(item_id):
     try:
         item = db.session.get(CartItem, item_id)
@@ -144,7 +144,7 @@ def remove_from_cart(item_id):
         }), 500
     
 
-@cart_bp.route('cart/item/<int:item_id>', methods = ['PATCH', 'POST'])
+@cart_bp.route('carts/item/<int:item_id>', methods = ['PATCH', 'POST'])
 def update_cart_item(item_id):
     try:
         item = db.session.get(CartItem, item_id)
@@ -185,4 +185,71 @@ def update_cart_item(item_id):
         }), 500
 
 
+@cart_bp.route('carts/checkout/<int:user_id>', methods = ['POST'])
+def checkout(user_id):
+    try: 
+
+        from models import Order, OrderItem 
+
+        cart = Cart.query.filter_by(user_id=user_id).first()
+
+        if not cart or not cart.items:
+            return jsonify({
+                "status":"error", 
+                "message":"Cart is empty"
+            }), 400
+        
+        total_price = 0
+
+        order = Order(
+            user_id = user_id,
+            total_price = 0,
+            status = "pending"
+        )
+
+        db.session.add(order)
+        db.session.flush()
+
+        for item in cart.items:
+            product = item.product
+
+            if product.stock < item.quantity:
+                return jsonify({
+                    "status" : "error",
+                    "message" : f"Not enough stock for {product.name}"
+                }), 400
+            
+            product.stock -= item.quantity
+
+            subtotal = product.price * item.quantity
+            total_price += subtotal
+
+            order_item = OrderItem(
+                order_id = order.id,
+                product_id = product.id, 
+                quantity = item.quantity, 
+                price = product.price
+            )
+            
+            db.session.add(order_item)
+        
+        order.total_price = total_price
+
+        for item in cart.items:
+            db.session.delete(item)
+
+        db.session.commit()
+
+        return jsonify({
+            "status" : "success",
+            "message" : "Checkout successful",
+            "order_id" : order.id,
+            "total_price" : str(order.total_price)
+        }), 200
+    
+    except Exception as e:
+        return jsonify({
+            "status" : "error",
+            "message" : str(e)
+        }), 500
 

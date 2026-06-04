@@ -1,4 +1,6 @@
-#!/home/bonisam-kelekoh/Desktop/Jerseys_project/venv/bin/python3
+#!/bin/sh
+'''exec' "/home/bonisam-kelekoh/Desktop/JERSEYS(Personal project)/Jerseys_project_backend/venv/bin/python3" "$0" "$@"
+' '''
 # -*- coding: utf-8 -*-
 import re
 import sys

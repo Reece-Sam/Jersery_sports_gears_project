@@ -1,14 +1,15 @@
 from flask import Blueprint, request, jsonify
 from extensions import db
-from models import User
 from werkzeug.security import generate_password_hash, check_password_hash 
+from flask_mail import Message
+from extensions import db, mail
+from models import User
 
 
 user_bp = Blueprint('user_bp', __name__)
 
-@user_bp.route('/users', methods=['POST'])
+@user_bp.route('/', methods=['POST'])
 def create_user():
-
     try:
         data = request.get_json()
 
@@ -19,21 +20,23 @@ def create_user():
 
         if not name or not email or not phone_number or not password:
             return jsonify({
-                "status" : "fail",
-                "message" : "Missing required field"
+                "status": "fail",
+                "message": "Missing required field"
             }), 400
 
-        # check if user exists
+        # Check if user already exists
         existing_user = User.query.filter_by(email=email).first()
 
         if existing_user:
             return jsonify({
-                "status" : "error",
+                "status": "error",
                 "message": "Email already exists"
             }), 400
 
+        # Hash password
         hashed_password = generate_password_hash(password)
 
+        # Create user
         user = User(
             name=name,
             email=email,
@@ -44,8 +47,27 @@ def create_user():
         db.session.add(user)
         db.session.commit()
 
+        # Send welcome email
+        msg = Message(
+            subject="Welcome to Sports Store",
+            sender="your_email@gmail.com",
+            recipients=[email]
+        )
+
+        msg.body = f"""
+Hello {name},
+
+Welcome to Sports Store!
+
+Your account has been created successfully.
+
+Thank you for joining us.
+"""
+
+        mail.send(msg)
+
         return jsonify({
-            "status" : "Success",
+            "status": "success",
             "message": "User created successfully",
             "user_id": user.id
         }), 201
@@ -57,6 +79,7 @@ def create_user():
             "status": "error",
             "message": str(e)
         }), 500
+
 
 
 @user_bp.route('/users/login', methods=['POST'])
@@ -95,7 +118,7 @@ def login_user():
         }), 500
     
 
-@user_bp.route('/users', methods=['GET'])
+@user_bp.route('/', methods=['GET'])
 def get_users():
    
     try:

@@ -1,6 +1,6 @@
 from flask import Flask
 from flasgger import Swagger
-from extensions import db
+from extensions import db, mail
 from dotenv import load_dotenv
 from flask_cors import CORS
 from models import User, Product, Cart, CartItem, Order, OrderItem
@@ -8,6 +8,8 @@ from routes.user import user_bp
 from routes.product import product_bp
 from routes.cart import cart_bp
 from routes.order import order_bp
+from flask_mail import Mail
+
 
 import os
 
@@ -23,9 +25,19 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'super-secret-key')
 
 db.init_app(app)
+mail.init_app(app)
 
 # Swagger docs
 Swagger(app)
+
+#Mail
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'your_email@gmail.com'
+app.config['MAIL_PASSWORD'] = 'your_app_password'
+
+mail = Mail(app)
 
 # Register Blueprints
 app.register_blueprint(user_bp, url_prefix="/api/users")
@@ -47,3 +59,4 @@ def home():
 
 if __name__ == "__main__":
     app.run(debug=True)
+   

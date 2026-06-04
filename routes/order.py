@@ -4,7 +4,7 @@ from models import Order, OrderItem, Product, User
 
 order_bp = Blueprint('order_bp', __name__)
 
-@order_bp.route('/orders', methods = ['POST'])
+@order_bp.route('/', methods = ['POST'])
 def create_order():
 
     try: 
@@ -91,7 +91,7 @@ def create_order():
         }), 500
     
 
-@order_bp.route('/orders', methods = ['GET'])
+@order_bp.route('/', methods = ['GET'])
 def get_orders():
     try:
 
@@ -116,7 +116,7 @@ def get_orders():
         }), 500
     
 
-@order_bp.route('orders/<int:id>', methods = ['GET'])
+@order_bp.route('/<int:id>', methods = ['GET'])
 def get_order(id):
     try:
         order = db.session.get(Order, id)
