@@ -138,7 +138,7 @@ def get_users():
         }), 500
 
 
-@user_bp.route('/users/<int:id>', methods=['GET'])
+@user_bp.route('/<int:id>', methods=['GET'])
 def get_user(id):
    
     try:
@@ -164,7 +164,7 @@ def get_user(id):
         }), 500
 
 
-@user_bp.route('/users/<int:id>', methods=['PATCH'])
+@user_bp.route('/<int:id>', methods=['PATCH', 'PUT'])
 def update_user(id):
     
     try: 
@@ -206,7 +206,7 @@ def update_user(id):
         }), 500
 
 
-@user_bp.route('/users/<int:id>', methods = ['DELETE'])
+@user_bp.route('/<int:id>', methods = ['DELETE'])
 def delete_user(id):
     
     try:
