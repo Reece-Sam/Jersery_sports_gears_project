@@ -73,7 +73,7 @@ def get_products():
         }), 500
 
 
-@product_bp.route('/products/<int:id>', methods=['GET'])
+@product_bp.route('/<int:id>', methods=['GET'])
 def get_product(id):
 
     try:
@@ -102,7 +102,7 @@ def get_product(id):
         }), 500
 
 
-@product_bp.route('/products/<int:id>', methods=['PATCH', 'PUT'])
+@product_bp.route('/<int:id>', methods=['PATCH', 'PUT'])
 def update_product(id):
    
     try:

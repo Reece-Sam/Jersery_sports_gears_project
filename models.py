@@ -7,11 +7,13 @@ class User(db.Model):
     __tablename__ = "users"
     
     id = db.Column(db.Integer, primary_key=True)
+
     created_at = db.Column(
         db.DateTime,
         server_default=func.now(),
         nullable=False
     )
+
     updated_at = db.Column(
         db.DateTime,
         server_default=func.now(),
@@ -23,6 +25,12 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     phone_number = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(255), nullable=False)
+
+    orders = db.relationship(
+        'Order',
+        back_populates='user',
+        cascade='all, delete-orphan'
+    )
 
     def __repr__(self):
         return f'<User: {self.email}>'
@@ -49,29 +57,44 @@ class Product(db.Model):
     def __repr__(self):
         return f'<Product: {self.name}>'
     
-
+    
 class Order(db.Model):
     __tablename__ = "orders"
 
-    id = db.Column(db.Integer, primary_key = True)
+    id = db.Column(db.Integer, primary_key=True)
 
     created_at = db.Column(
-        db.DateTime, 
-        server_default = func.now(),
-        nullable = False 
+        db.DateTime,
+        server_default=func.now(),
+        nullable=False
     )
 
     updated_at = db.Column(
         db.DateTime,
-        server_default = func.now(),
-        onupdate = func.now(),
-        nullable = False
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False
     )
 
     total_price = db.Column(db.Numeric(10, 2), nullable=False)
     status = db.Column(db.String(50), default="pending")
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    user = db.relationship('User', backref='orders')
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id'),
+        nullable=False
+    )
+
+    user = db.relationship(
+         'User',
+         back_populates='orders'
+    )
+
+    items = db.relationship(
+        'OrderItem',
+        back_populates='order',
+        cascade='all, delete-orphan'
+    )
 
 
 class OrderItem(db.Model):
@@ -79,13 +102,26 @@ class OrderItem(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+    order_id = db.Column(
+        db.Integer,
+        db.ForeignKey('orders.id'),
+        nullable=False
+    )
+
+    product_id = db.Column(
+        db.Integer,
+        db.ForeignKey('products.id'),
+        nullable=False
+    )
 
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Numeric(10, 2), nullable=False)
 
-    order = db.relationship('Order', backref='item')
+    order = db.relationship(
+        'Order',
+        back_populates='items'
+    )
+
     product = db.relationship('Product')
 
 

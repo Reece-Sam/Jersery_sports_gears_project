@@ -11,7 +11,7 @@ def create_order():
         data = request.get_json()
 
         user_id = data.get('user_id')
-        items = data.get('item')
+        items = data.get('items')
 
         if not user_id or not items:
             return jsonify({
@@ -72,7 +72,7 @@ def create_order():
                     quantity = item["quantity"],
                     price = item["price"]
                 )
-                db.seesion.add(order_item)
+                db.session.add(order_item)
 
             db.session.commit()
 
@@ -187,7 +187,42 @@ def cancel_order(id):
         }), 500
 
 
-@order_bp.route('orders/<int:id>', methods = ['PATCH', 'PUT'])
+@order_bp.route('/<int:id>/status', methods=['PUT'])
+def update_order_status(id):
+    try:
+        order = db.session.get(Order, id)
+
+        if not order:
+            return jsonify({"message": "Order not found"}), 404
+
+        data = request.get_json()
+        new_status = data.get("status")
+
+        allowed = ["pending", "paid", "shipped", "delivered", "cancelled"]
+
+        if new_status not in allowed:
+            return jsonify({
+                "message": "Invalid status"
+            }), 400
+
+        order.status = new_status
+        db.session.commit()
+
+        return jsonify({
+            "status": "success",
+            "message": "Order status updated",
+            "order_id": order.id,
+            "new_status": order.status
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "status" : "error",
+            "message" : str(e)
+        }), 500
+
+
+@order_bp.route('/<int:id>', methods = ['PATCH', 'PUT'])
 def update_order(id):
     try:
         order = db.session.get(Order, id)
@@ -219,7 +254,7 @@ def update_order(id):
         }), 500
 
 
-@order_bp.route('orders/<int:id>', methods = ['DELETE'])
+@order_bp.route('/<int:id>', methods = ['DELETE'])
 def delete_order(id):
     try: 
         order = db.session.get(Order, id)

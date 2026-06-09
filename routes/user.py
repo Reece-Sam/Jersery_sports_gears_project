@@ -13,6 +13,12 @@ def create_user():
     try:
         data = request.get_json()
 
+        if not isinstance(data, dict):
+            return jsonify({
+                "status": "error",
+                "message": "Invalid or missing JSON body"
+            }), 400
+
         name = data.get('name')
         email = data.get('email')
         phone_number = data.get('phone_number')
@@ -24,7 +30,7 @@ def create_user():
                 "message": "Missing required field"
             }), 400
 
-        # Check if user already exists
+        # Check if us
         existing_user = User.query.filter_by(email=email).first()
 
         if existing_user:
@@ -50,7 +56,7 @@ def create_user():
         # Send welcome email
         msg = Message(
             subject="Welcome to Sports Store",
-            sender="your_email@gmail.com",
+            sender="bebsyanski@gmail.com",
             recipients=[email]
         )
 
@@ -208,27 +214,91 @@ def update_user(id):
 
 @user_bp.route('/<int:id>', methods = ['DELETE'])
 def delete_user(id):
-    
     try:
         user = db.session.get(User, id)
 
         if not user:
             return jsonify({
-                "status" : "error",
-                "message" : "User not found"
+                "status": "error",
+                "message": "User not found"
             }), 404
-        
-        db.session.delete(user)
+
+        user.is_active = False
         db.session.commit()
 
         return jsonify({
-           "status" : "success",
-           "message" : "User deleted successfully"
+            "status": "success",
+            "message": "User deactivated successfully"
         }), 200
-    
+
     except Exception as e:
         return jsonify({
             "status" : "error",
             "message" : str(e)
         }), 500
+
+
+
+
+
+
+# def delete_user(id):
+
+#     try:
+#         user = db.session.get(User, id)
+
+#         if not user:
+#             return jsonify({
+#                 "status": "error",
+#                 "message": "User not found"
+#             }), 404
+
+#         print("USER:", user.id)
+#         print("ORDERS:", user.orders)
+
+#         db.session.delete(user)
+#         db.session.commit()
+
+#         return jsonify({
+#             "status": "success",
+#             "message": "User deleted successfully"
+#         }), 200
+
+#     except Exception as e:
+#         db.session.rollback()
+
+#         print("ERROR:", e)
+
+#         return jsonify({
+#             "status": "error",
+#             "message": str(e)
+#         }), 500
+
+
+
+
+# def delete_user(id):
+    
+#     try:
+#         user = db.session.get(User, id)
+
+#         if not user:
+#             return jsonify({
+#                 "status" : "error",
+#                 "message" : "User not found"
+#             }), 404
+        
+#         db.session.delete(user)
+#         db.session.commit()
+
+#         return jsonify({
+#            "status" : "success",
+#            "message" : "User deleted successfully"
+#         }), 200
+    
+#     except Exception as e:
+#         return jsonify({
+#             "status" : "error",
+#             "message" : str(e)
+#         }), 500
     
