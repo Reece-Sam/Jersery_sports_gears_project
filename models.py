@@ -25,6 +25,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     phone_number = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(255), nullable=False)
+    is_deleted = db.Column(db.Boolean, default=False)
 
     orders = db.relationship(
         'Order',

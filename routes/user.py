@@ -87,8 +87,7 @@ Thank you for joining us.
         }), 500
 
 
-
-@user_bp.route('/users/login', methods=['POST'])
+@user_bp.route('/login', methods=['POST'])
 def login_user():
 
     try:
@@ -103,7 +102,11 @@ def login_user():
                 "message": "Email and password are required"
             }), 400
 
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter_by(
+            email=email,
+            is_deleted=False
+        ).first()
+ 
 
         if not user or not check_password_hash(user.password, password):
             return jsonify({
@@ -128,7 +131,7 @@ def login_user():
 def get_users():
    
     try:
-        users = User.query.all()
+        users = User.query.filter_by(is_deleted=False).all()
 
         return jsonify([{
             "id": user.id,
@@ -148,14 +151,17 @@ def get_users():
 def get_user(id):
    
     try:
-        user = db.session.get(User, id)
+        user = User.query.filter_by(
+            id=id,
+            is_deleted=False
+        ).first()
 
         if user is None:
             return jsonify({
                 "status": "error",
                 "message": "User not found"
             }), 404
-
+        
         return jsonify({
             "id": user.id,
             "name": user.name,
@@ -222,13 +228,19 @@ def delete_user(id):
                 "status": "error",
                 "message": "User not found"
             }), 404
+        
+        if user.is_deleted:
+            return jsonify({
+                "status": "error",
+                "message": "User already deleted"
+            }), 400
 
-        user.is_active = False
+        user.is_deleted = True
         db.session.commit()
 
         return jsonify({
             "status": "success",
-            "message": "User deactivated successfully"
+            "message": "User deleted successfully"
         }), 200
 
     except Exception as e:
