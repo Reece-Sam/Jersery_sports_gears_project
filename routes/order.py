@@ -56,33 +56,33 @@ def create_order():
 
             product.stock -= item['quantity']
 
-            order = Order(
-                user_id = user_id,
-                total_price = total_price,
-                status = "pending"
+        order = Order(
+            user_id = user_id,
+            total_price = total_price,
+            status = "pending"
+        )
+
+        db.session.add(order)
+        db.session.flush()
+
+        for item in order_items:
+            order_item = OrderItem(
+                order_id = order.id,
+                product_id = item["product"].id,
+                quantity = item["quantity"],
+                price = item["price"]
             )
+            db.session.add(order_item)
 
-            db.session.add(order)
-            db.session.flush()
+        db.session.commit()
 
-            for item in order_items:
-                order_item = OrderItem(
-                    order_id = order.id,
-                    product_id = item["product"].id,
-                    quantity = item["quantity"],
-                    price = item["price"]
-                )
-                db.session.add(order_item)
-
-            db.session.commit()
-
-            return jsonify({
-                "status" : "Success",
-                "message" : "Order created successfully",
-                "order_id" : order.id,
-                "total_price" : str(order.total_price),
-                "status" : order.status
-            }), 201
+        return jsonify({
+            "status" : "Success",
+            "message" : "Order created successfully",
+            "order_id" : order.id,
+            "total_price" : str(order.total_price),
+            "status" : order.status
+        }), 201
     
     except Exception as e:
         return jsonify({
@@ -151,7 +151,7 @@ def get_order(id):
         }), 500
     
 
-@order_bp.route('/orders/<int:id>/cancel', methods = ['PATCH'])
+@order_bp.route('/<int:id>/cancel', methods = ['PATCH'])
 def cancel_order(id):
     try:
         order = db.session.get(Order, id)

@@ -97,6 +97,64 @@ class Order(db.Model):
         cascade='all, delete-orphan'
     )
 
+    payment = db.relationship(
+        'Payment',
+        back_populates='order',
+        uselist=False,
+        cascade='all, delete-orphan'
+    )
+
+
+class Payment(db.Model):
+    __tablename__ = "payments"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    order_id = db.Column(
+        db.Integer,
+        db.ForeignKey('orders.id'),
+        nullable=False,
+        unique=True
+    )
+
+    payment_method = db.Column(
+        db.String(50),
+        nullable=False
+    )
+
+    phone_number = db.Column(
+        db.String(20),
+        nullable=False
+    )
+
+    amount = db.Column(
+        db.Numeric(10, 2),
+        nullable=False
+    )
+
+    status = db.Column(
+        db.String(20),
+        default="pending"
+    )
+
+    transaction_id = db.Column(
+        db.String(100),
+        unique=True,
+        nullable=True
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=func.now(),
+        nullable=False
+    )
+
+    order = db.relationship(
+        'Order',
+        back_populates='payment'
+    )
+
+
 
 class OrderItem(db.Model):
     __tablename__ = "order_items"

@@ -161,7 +161,7 @@ def update_product(id):
             "message": str(e)
         }), 500
 
-@product_bp.route('/products/<int:id>', methods = ['DELETE'])
+@product_bp.route('/<int:id>', methods = ['DELETE'])
 def delete_product(id):
 
     try:
