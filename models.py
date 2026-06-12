@@ -79,6 +79,8 @@ class Order(db.Model):
 
     total_price = db.Column(db.Numeric(10, 2), nullable=False)
     status = db.Column(db.String(50), default="pending")
+    
+
 
     user_id = db.Column(
         db.Integer,

@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from extensions import db
-from models import Cart, CartItem, Product, User
+from models import Cart, CartItem, Product, User, Payment
 
 cart_bp = Blueprint('cart_bp', __name__)
 
@@ -107,7 +107,7 @@ def add_to_cart():
         db.session.commit()
 
         return jsonify({
-            "status" : "error",
+            "status" : "success",
             "message" : "Item added to cart"
         }), 200
     
@@ -133,7 +133,7 @@ def remove_from_cart(item_id):
         db.session.commit()
 
         return jsonify({
-            "status" : "error",
+            "status" : "success",
             "message" : "Item removed from cart"
         }), 200
     
@@ -174,7 +174,7 @@ def update_cart_item(item_id):
         db.session.commit()
 
         return jsonify({
-            "status" : "error",
+            "status" : "success",
             "message" : "Cart updated successfully"
         }), 200
     
@@ -188,11 +188,12 @@ def update_cart_item(item_id):
 @cart_bp.route('/checkout/<int:user_id>', methods=['POST'])
 def checkout(user_id):
     try:
-        from models import Order, OrderItem
+        from models import Order, OrderItem, Payment
 
         data = request.get_json()
 
         payment_method = data.get("payment_method")
+        phone_number = data.get("phone_number")
 
         allowed_methods = [
             "mtn_mobile_money",
@@ -218,9 +219,7 @@ def checkout(user_id):
         order = Order(
             user_id=user_id,
             total_price=0,
-            status="pending",
-            payment_method=payment_method,
-            payment_status="pending"
+            status="pending"
         )
 
         db.session.add(order)
@@ -250,7 +249,17 @@ def checkout(user_id):
 
             db.session.add(order_item)
 
-        order.total_price = total_price
+        order.total_price = total_price 
+
+        payment = Payment(
+            order_id = order.id,
+            payment_method = payment_method,
+            phone_number = phone_number,
+            amount = total_price,
+            status = "pending"
+        )
+
+        db.session.add(payment)
 
         for item in cart.items:
             db.session.delete(item)
@@ -261,8 +270,9 @@ def checkout(user_id):
             "status": "success",
             "message": "Checkout successful",
             "order_id": order.id,
-            "payment_method": order.payment_method,
-            "payment_status": order.payment_status,
+            "payment_id" : payment.id,
+           "payment_method": order.payment.payment_method,
+           "payment_status": order.payment.status,
             "total_price": str(order.total_price)
         }), 200
 
