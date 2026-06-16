@@ -177,7 +177,7 @@ def cancel_order(id):
 
         return jsonify({
             "status" : "success",
-            "message" : "Order Cancelled"
+            "message" : "Order Cancelled Successfully"
         }), 200
     
     except Exception as e:
@@ -215,38 +215,6 @@ def update_order_status(id):
             "new_status": order.status
         }), 200
 
-    except Exception as e:
-        return jsonify({
-            "status" : "error",
-            "message" : str(e)
-        }), 500
-
-
-@order_bp.route('/<int:id>', methods = ['PATCH', 'PUT'])
-def update_order(id):
-    try:
-        order = db.session.get(Order, id)
-
-        if not order:
-            return jsonify({
-                "status" : "error",
-                "message" : "Order not found"
-            }), 404
-        
-        data = request.get_json()
-
-        if 'status' in data:
-            order.status = data['status']
-
-        db.session.commit()
-
-        return jsonify({
-            "status" : "success",
-            "message" : "Order updated successfully",
-            "order_id" : order.id,
-            "status" : order.status
-        }), 200
-    
     except Exception as e:
         return jsonify({
             "status" : "error",

@@ -144,7 +144,7 @@ def remove_from_cart(item_id):
         }), 500
     
 
-@cart_bp.route('/item/<int:item_id>', methods = ['PATCH', 'POST'])
+@cart_bp.route('/item/<int:item_id>', methods = ['PATCH', 'PUT'])
 def update_cart_item(item_id):
     try:
         item = db.session.get(CartItem, item_id)
@@ -190,10 +190,24 @@ def checkout(user_id):
     try:
         from models import Order, OrderItem, Payment
 
+        user = db.session.get(User, user_id)
+
+        if not user:
+            return jsonify({
+                "status" : "error",
+                "message" : "User not found"
+            }), 404
+
         data = request.get_json()
 
         payment_method = data.get("payment_method")
         phone_number = data.get("phone_number")
+
+        if not phone_number:
+            return jsonify({
+                "status" : "error",
+                "message" : "Phone number is required"
+            }), 400
 
         allowed_methods = [
             "mtn_mobile_money",
