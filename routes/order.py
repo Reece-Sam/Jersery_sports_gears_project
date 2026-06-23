@@ -1,11 +1,62 @@
 from flask import Blueprint, request, jsonify
 from extensions import db
 from models import Order, OrderItem, Product, User
+from services.order_service import create_order_from_cart
 
 order_bp = Blueprint('order_bp', __name__)
 
 @order_bp.route('/', methods = ['POST'])
 def create_order():
+    """
+    Create a new order
+    ---
+    tags:
+      - Orders
+
+    consumes:
+      - application/json
+
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - user_id
+            - items
+          properties:
+            user_id:
+              type: integer
+              example: 1
+            items:
+              type: array
+              items:
+                type: object
+                required:
+                  - product_id
+                  - quantity
+                properties:
+                  product_id:
+                    type: integer
+                    example: 2
+                  quantity:
+                    type: integer
+                    example: 3
+
+    responses:
+      201:
+        description: Order created successfully
+
+      400:
+        description: Missing fields or insufficient stock
+
+      404:
+        description: User or product not found
+
+      500:
+        description: Internal server error
+    """
 
     try: 
         data = request.get_json()
@@ -91,8 +142,52 @@ def create_order():
         }), 500
     
 
+@order_bp.route('/from-cart/<int:user_id>', methods=['POST'])
+def create_order_from_cart(user_id):
+    """
+    Create an order from the user's cart
+    ---
+    tags:
+      - Orders
+
+    parameters:
+      - name: user_id
+        in: path
+        required: true
+        type: integer
+
+    responses:
+      201:
+        description: Order created successfully
+
+      400:
+        description: Cart is empty
+
+      404:
+        description: User not found
+
+      500:
+        description: Internal server error
+    """
+    return create_order_from_cart(user_id)
+    
+
 @order_bp.route('/', methods = ['GET'])
 def get_orders():
+    """
+    Get all orders
+    ---
+    tags:
+      - Orders
+
+    responses:
+      200:
+        description: List of all orders
+
+      500:
+        description: Internal server error
+    """
+
     try:
 
         orders = Order.query.all()
@@ -118,6 +213,30 @@ def get_orders():
 
 @order_bp.route('/<int:id>', methods = ['GET'])
 def get_order(id):
+    """
+    Get an order by ID
+    ---
+    tags:
+      - Orders
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        description: Order ID
+
+    responses:
+      200:
+        description: Order retrieved successfully
+
+      404:
+        description: Order not found
+
+      500:
+        description: Internal server error
+    """
+  
     try:
         order = db.session.get(Order, id)
 
@@ -153,6 +272,33 @@ def get_order(id):
 
 @order_bp.route('/<int:id>/cancel', methods = ['PATCH'])
 def cancel_order(id):
+    """
+    Cancel an order
+    ---
+    tags:
+      - Orders
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        description: Order ID
+
+    responses:
+      200:
+        description: Order cancelled successfully
+
+      400:
+        description: Order is already cancelled
+
+      404:
+        description: Order not found
+
+      500:
+        description: Internal server error
+    """
+
     try:
         order = db.session.get(Order, id)
 
@@ -189,6 +335,54 @@ def cancel_order(id):
 
 @order_bp.route('/<int:id>/status', methods=['PUT'])
 def update_order_status(id):
+    """
+    Update an order's status
+    ---
+    tags:
+      - Orders
+
+    consumes:
+      - application/json
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        description: Order ID
+
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - status
+          properties:
+            status:
+              type: string
+              enum:
+                - pending
+                - paid
+                - shipped
+                - delivered
+                - cancelled
+              example: shipped
+
+    responses:
+      200:
+        description: Order status updated successfully
+
+      400:
+        description: Invalid order status
+
+      404:
+        description: Order not found
+
+      500:
+        description: Internal server error
+    """
+
     try:
         order = db.session.get(Order, id)
 
@@ -224,6 +418,30 @@ def update_order_status(id):
 
 @order_bp.route('/<int:id>', methods = ['DELETE'])
 def delete_order(id):
+    """
+    Delete an order
+    ---
+    tags:
+      - Orders
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        description: Order ID
+
+    responses:
+      200:
+        description: Order deleted successfully
+
+      404:
+        description: Order not found
+
+      500:
+        description: Internal server error
+    """
+
     try: 
         order = db.session.get(Order, id)
 

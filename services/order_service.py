@@ -1,7 +1,6 @@
-from flask import Blueprint, request, jsonify
+from flask import jsonify
 from extensions import db
 from models import Order, OrderItem, Product, User
-from services.order_service import create_order_from_cart
 
 
 def create_order_from_cart(user_id):

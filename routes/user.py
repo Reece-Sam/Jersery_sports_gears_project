@@ -10,6 +10,51 @@ user_bp = Blueprint('user_bp', __name__)
 
 @user_bp.route('/', methods=['POST'])
 def create_user():
+    """
+    Create a new user
+    ---
+    tags:
+      - Users
+
+    consumes:
+      - application/json
+
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - name
+            - email
+            - phone_number
+            - password
+          properties:
+            name:
+              type: string
+              example: John Doe
+            email:
+              type: string
+              example: john@gmail.com
+            phone_number:
+              type: string
+              example: "677123456"
+            password:
+              type: string
+              example: password123
+
+    responses:
+      201:
+        description: User created successfully
+
+      400:
+        description: Missing fields or email already exists
+
+      500:
+        description: Internal server error
+    """
+
     try:
         data = request.get_json()
 
@@ -89,6 +134,45 @@ Thank you for joining us.
 
 @user_bp.route('/login', methods=['POST'])
 def login_user():
+    """
+    Login user
+    ---
+    tags:
+      - Users
+
+    consumes:
+      - application/json
+
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - email
+            - password
+          properties:
+            email:
+              type: string
+              example: john@gmail.com
+            password:
+              type: string
+              example: password123
+
+    responses:
+      200:
+        description: Login successful
+
+      400:
+        description: Email and password required
+
+      401:
+        description: Invalid credentials
+
+      500:
+        description: Internal server error
+    """
 
     try:
         data = request.get_json()
@@ -129,6 +213,19 @@ def login_user():
 
 @user_bp.route('/', methods=['GET'])
 def get_users():
+    """
+    Retrieve all users
+    ---
+    tags:
+      - Users
+
+    responses:
+      200:
+        description: List of users
+
+      500:
+        description: Internal server error
+    """
    
     try:
         users = User.query.filter_by(is_deleted=False).all()
@@ -149,6 +246,29 @@ def get_users():
 
 @user_bp.route('/<int:id>', methods=['GET'])
 def get_user(id):
+    """
+    Retrieve a user by ID
+    ---
+    tags:
+      - Users
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        description: User ID
+
+    responses:
+      200:
+        description: User found
+
+      404:
+        description: User not found
+
+      500:
+        description: Internal server error
+    """
    
     try:
         user = User.query.filter_by(
@@ -178,7 +298,49 @@ def get_user(id):
 
 @user_bp.route('/<int:id>', methods=['PATCH', 'PUT'])
 def update_user(id):
-    
+    """
+    Update user details
+    ---
+    tags:
+      - Users
+
+    consumes:
+      - application/json
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        description: User ID
+
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+              example: John Smith
+            phone_number:
+              type: string
+              example: "675987654"
+            password:
+              type: string
+              example: newpassword123
+
+    responses:
+      200:
+        description: User updated successfully
+
+      404:
+        description: User not found
+
+      500:
+        description: Internal server error
+    """
+   
     try: 
         user = db.session.get(User, id)
 
@@ -220,6 +382,33 @@ def update_user(id):
 
 @user_bp.route('/<int:id>', methods = ['DELETE'])
 def delete_user(id):
+    """
+    Soft delete a user
+    ---
+    tags:
+      - Users
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        description: User ID
+
+    responses:
+      200:
+        description: User deleted successfully
+
+      400:
+        description: User already deleted
+
+      404:
+        description: User not found
+
+      500:
+        description: Internal server error
+    """
+
     try:
         user = db.session.get(User, id)
 

@@ -6,6 +6,26 @@ cart_bp = Blueprint('cart_bp', __name__)
 
 @cart_bp.route('/<int:user_id>', methods = ['GET'])
 def get_cart(user_id):
+    """
+    Gets a user's shopping cart
+    ---
+    tags:
+      - Cart
+
+    parameters:
+      - name: user_id
+        in: path
+        type: integer
+        required: true
+        description: ID of the user whose cart is being retrieved 
+
+    responses: 
+      200:
+        description: Cart retrieved successfully (or empty cart)
+
+      500:
+        description: Internal server error     
+    """
 
     try:
         cart = Cart.query.filter_by(user_id=user_id).first()
@@ -48,6 +68,49 @@ def get_cart(user_id):
 
 @cart_bp.route('/add', methods = ['POST'])
 def add_to_cart():
+    """
+    Add a product to the cart
+    ---
+    tags: 
+      - Cart
+    
+    consumes:
+      - application/json
+
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema: 
+          type: object
+          required:
+            - user_id 
+            - product_id
+          properties:
+            user_id:
+              type: integer
+              example: 1
+            product_id:
+              type: integer
+              example: 5
+            quantity:
+              type: integer
+              example: 2
+
+    responses: 
+      200: 
+        description: Item added to cart successfully
+
+      400: 
+        description: Missing fields or insufficient stock
+
+      404: 
+        description: User or product not found
+
+      500: 
+        description: Internal server error                 
+    """
+
     try:
 
         data = request.get_json()
@@ -120,6 +183,30 @@ def add_to_cart():
 
 @cart_bp.route('/item/<int:item_id>', methods = ['DELETE'])
 def remove_from_cart(item_id):
+    """
+    Remove an item from the cart
+    ---
+    tags: 
+      - Cart
+    
+    parameters:
+      - name: item_id
+        in: path
+        type: integer
+        required: true
+        description: Cart item ID
+    
+    responses:
+      200:
+        description: Item removed successfully
+      
+      404: 
+        description: Cart item not found
+      
+      500: 
+        description: Internal server error
+    """
+
     try:
         item = db.session.get(CartItem, item_id)
 
@@ -146,6 +233,48 @@ def remove_from_cart(item_id):
 
 @cart_bp.route('/item/<int:item_id>', methods = ['PATCH', 'PUT'])
 def update_cart_item(item_id):
+    """
+    Update the quantity of a cart item
+    ---
+    tags:
+      - Cart
+
+    consumes:
+      - application/json
+
+    parameters:
+      - name: item_id
+        in: path
+        type: integer
+        required: true
+        description: Cart item ID
+
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - quantity
+          properties:
+            quantity:
+              type: integer
+              example: 3
+
+    responses:
+      200:
+        description: Cart updated successfully
+
+      400:
+        description: Invalid quantity or insufficient stock
+
+      404:
+        description: Cart item not found
+
+      500:
+        description: Internal server error
+    """
+
     try:
         item = db.session.get(CartItem, item_id)
 
@@ -187,6 +316,55 @@ def update_cart_item(item_id):
 
 @cart_bp.route('/checkout/<int:user_id>', methods=['POST'])
 def checkout(user_id):
+    """
+     Checkout a user's cart and create an order
+    ---
+    tags:
+      - Cart
+
+    consumes:
+      - application/json
+
+    parameters:
+      - name: user_id
+        in: path
+        type: integer
+        required: true
+        description: User ID
+
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - payment_method
+            - phone_number
+          properties:
+            payment_method:
+              type: string
+              enum:
+                - mtn_mobile_money
+                - orange_money
+              example: mtn_mobile_money
+            phone_number:
+              type: string
+              example: "677123456"
+
+    responses:
+      200:
+        description: Checkout completed successfully
+
+      400:
+        description: Invalid payment method, empty cart, missing phone number, or insufficient stock
+
+      404:
+        description: User not found
+
+      500:
+        description: Internal server error
+    """
+    
     try:
         from models import Order, OrderItem, Payment
 
