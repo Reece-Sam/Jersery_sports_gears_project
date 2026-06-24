@@ -214,7 +214,7 @@ def login_user():
 @user_bp.route('/', methods=['GET'])
 def get_users():
     """
-    Retrieve all users
+    Get all users
     ---
     tags:
       - Users
@@ -247,7 +247,7 @@ def get_users():
 @user_bp.route('/<int:id>', methods=['GET'])
 def get_user(id):
     """
-    Retrieve a user by ID
+    Get a user by ID
     ---
     tags:
       - Users

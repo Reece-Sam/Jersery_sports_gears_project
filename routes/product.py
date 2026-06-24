@@ -6,6 +6,53 @@ product_bp = Blueprint('product_bp', __name__)
 
 @product_bp.route('/', methods=['POST'])
 def create_product():
+    """
+    Create a new product
+    ---
+    tags:
+      - Products
+    
+    consumes:
+      - application/json
+
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - name
+            - price
+            - stock
+          properties: 
+            name: 
+              type: string
+              example: Chelsea Home Jersey 2025
+            description: 
+               type: number
+               format: float
+               example: 12000
+            stock: 
+               type: integer
+               example: 50
+            category:
+               type: string
+               example: Football Jerseys
+            image_url:
+               type: string
+               example: https://example.com/images/chelsea.jpg
+
+        responses:
+           201: 
+             description: Product created successfully
+
+           400: 
+             description: Missing required fields
+
+           500:
+             description: Internal server error    
+    """
 
     try:
         data = request.get_json()
@@ -48,6 +95,19 @@ def create_product():
 
 @product_bp.route('/', methods=['GET'])
 def get_products():
+    """
+    Get all products
+    ---
+    tags:
+      - Products
+
+    responses:
+      200:
+        description: List of products
+
+      500:
+        description: Internal server error
+    """
 
     try:
         products = Product.query.all()
@@ -75,6 +135,29 @@ def get_products():
 
 @product_bp.route('/<int:id>', methods=['GET'])
 def get_product(id):
+    """
+    Get a product by ID
+    ---
+    tags:
+      - Products
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        description: Product ID
+
+    responses:
+      200:
+        description: Product retrieved successfully
+
+      404:
+        description: Product not found
+
+      500:
+        description: Internal server error
+    """
 
     try:
         product = db.session.get(Product, id)
@@ -104,6 +187,61 @@ def get_product(id):
 
 @product_bp.route('/<int:id>', methods=['PATCH', 'PUT'])
 def update_product(id):
+    """
+    Update an existing product
+    ---
+    tags:
+      - Products
+
+    consumes:
+      - application/json
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        description: Product ID
+
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Barcelona Away Jersey
+            description:
+              type: string
+              example: Updated jersey description.
+            price:
+              type: number
+              format: float
+              example: 30000
+            stock:
+              type: integer
+              example: 80
+            category:
+              type: string
+              example: Football Jerseys
+            image_url:
+              type: string
+              example: https://example.com/images/barcelona-away.jpg
+
+    responses:
+      200:
+        description: Product updated successfully
+
+      400:
+        description: No data provided
+
+      404:
+        description: Product not found
+
+      500:
+        description: Internal server error
+    """
    
     try:
         product = db.session.get(Product, id)
@@ -163,6 +301,29 @@ def update_product(id):
 
 @product_bp.route('/<int:id>', methods = ['DELETE'])
 def delete_product(id):
+    """
+    Delete a product
+    ---
+    tags:
+      - Products
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        description: Product ID
+
+    responses:
+      200:
+        description: Product deleted successfully
+
+      404:
+        description: Product not found
+
+      500:
+        description: Internal server error
+    """
 
     try:
         product = db.session.get(Product, id)
