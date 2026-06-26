@@ -1,0 +1,40 @@
+ src/
+│
+├── assets/
+│   ├── images/
+│   └── logos/
+│
+├── components/
+│   ├── Navbar.jsx
+│   ├── Footer.jsx
+│   ├── ProductCard.jsx
+│   ├── CartItem.jsx
+│   └── Button.jsx
+├── pages/
+│   ├── Home.jsx
+│   ├── ProductDetails.jsx
+│   ├── Cart.jsx
+│   ├── Orders.jsx
+│   ├── Login.jsx
+│   └── Register.jsx
+│
+├── services/
+│   ├── api.js
+│   ├── productService.js
+│   ├── cartService.js
+│   ├── orderService.js
+│   └── userService.js
+│
+├── css/
+│   ├── navbar.css
+│   ├── footer.css
+│   ├── productCard.css
+│   ├── home.css
+│   ├── cart.css
+│   ├── login.css
+│   ├── register.css
+│   └── global.css
+│
+├── App.jsx
+├── main.jsx
+└── routes.jsx
