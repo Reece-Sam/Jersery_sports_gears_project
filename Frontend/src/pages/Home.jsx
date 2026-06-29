@@ -1,23 +1,25 @@
 import ProductCard from "../components/ProductCard";
 import "../css/home.css";
 
-function Home() {
+import realMadrid from "../assets/images/Real-Madrid-blue.jpg";
+import chelsea from "../assets/images/Chelsea-2021.jpg";
+
   const products = [
     {
       id: 1,
       name: "Real Madrid blue Jersey",
       price: 12000,
-      image_url:
-        "src/assets/images/pexels-franklin-nwokoma-2155224311-33726647.jpg",
+      image_url: realMadrid,
     },
     {
       id: 2,
       name: "Chelsea Jersey",
       price: 11000,
-      image_url: "src/assets/images/simon-reza-YofQmnc-wns-unsplash.jpg",
+      image_url: chelsea,
     },
   ];
 
+function Home() {
   return (
     <div className="home">
       <h1>Latest Jerseys</h1>

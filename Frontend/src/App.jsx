@@ -1,29 +1,17 @@
 import { BrowserRouter } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import ProductCard from "./components/ProductCard";
+import Home from "./pages/Home";
 
 function App() {
   return (
     <BrowserRouter>
       <Navbar />
-      <ProductCard />
+      <Home />
     </BrowserRouter>
   );
 }
 
 export default App;
-
-
-
-
-
-
-
-
-
-
-
-
 
 // import { useState } from 'react'
 // import reactLogo from './assets/react.svg'
