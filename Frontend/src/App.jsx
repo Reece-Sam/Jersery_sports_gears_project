@@ -2,7 +2,7 @@ import { BrowserRouter } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Footer from "./components/Footer";
-import CartItem from "./components/CartItem";
+import Cart from "./pages/Cart";
 
 function App() {
   return (
@@ -10,7 +10,7 @@ function App() {
       <Navbar />
       <Home />
       <Footer />
-      <CartItem />
+      <Cart />
     </BrowserRouter>
   );
 }
