@@ -7,13 +7,27 @@
   padding: 15px 30px;
 }
 
+
 .navbar ul {
   display: flex;
   gap: 20px;
   list-style: none;
 }
 
+
 .navbar a {
-  color: white;
   text-decoration: none;
+  color: white;
+  transition: color 0.3s ease;
+}
+
+
+.navbar a:hover {
+  color: #f5c542;
+}
+
+
+.navbar a.active {
+  color: #f5c542;
+  font-weight: bold;
 }

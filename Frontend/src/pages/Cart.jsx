@@ -11,13 +11,47 @@ function Cart() {
       price: 12000
     };
 
-    return (
-        <div className="cart-page">
-            <h2>Shopping Cart</h2>
+   const shipping = 1000;
+   const subtotal = item.price * item.quantity;
+   const total = subtotal + shipping;
 
-            <CartItem item={item} />
+   return (
+    <div className="cart-page">
+        <div className="cart-container">
+            <div className="cart-items">
+                <h2>Shopping Cart</h2>
+                 
+                <CartItem item={item} />
+            </div>
+
+            <div className="order-summary">
+                <h2>Order Summary</h2>
+
+                <div className="summary-row">
+                    <span>Subtotal</span>
+                    <span>{subtotal.toLocaleString()} FCFA</span>
+                </div>
+
+                <div className="summary-row">
+                    <span>Shipping</span>
+                    <span>{shipping.toLocaleString()} FCFA</span>
+                </div>
+
+                <hr />
+
+                <div className="summary-row total">
+                    <span>Total</span>
+                    <span>{total.toLocaleString()} FCFA</span>
+                </div>
+
+                <button className="checkout-btn">
+                    Proceed to Checkout
+                </button>
+
+            </div>
         </div>
-    );
+    </div>
+   )
 }
 
 export default Cart;
