@@ -1,7 +1,13 @@
 import {NavLink} from "react-router-dom";
+import { useContext } from "react";
+import { CartContext } from "../context/CartContext";
 import "../css/navbar.css";
 
 function Navbar() {
+  const { cartItems } = useContext(CartContext);
+
+  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+
     return (
       <nav className="navbar">
         <h2>THE LEAGUE</h2>
@@ -11,7 +17,7 @@ function Navbar() {
             <NavLink to="/">Home</NavLink>
           </li>
           <li>
-            <NavLink to="/cart">Cart</NavLink>
+            <NavLink to="/cart"> 🛒 Cart ({cartCount})</NavLink>
           </li>
           <li>
             <NavLink to="/orders">Orders</NavLink>
