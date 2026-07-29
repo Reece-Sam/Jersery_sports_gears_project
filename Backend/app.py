@@ -1,3 +1,4 @@
+from flask_migrate import Migrate
 from flask import Flask
 from flasgger import Swagger
 from extensions import db, mail
@@ -28,6 +29,8 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'super-secret-key')
 db.init_app(app)
 mail.init_app(app)
 
+migrate = Migrate(app, db)
+
 # Swagger docs
 Swagger(app)
 
@@ -48,9 +51,9 @@ app.register_blueprint(order_bp, url_prefix="/api/orders")
 
 
 # Create tables
-with app.app_context():
-    # db.drop_all()  # careful with this in production
-    db.create_all()
+# with app.app_context():
+#     # db.drop_all()  # careful with this in production
+#     db.create_all()
 
 
 @app.route('/')

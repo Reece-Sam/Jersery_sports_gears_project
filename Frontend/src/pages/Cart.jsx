@@ -1,23 +1,52 @@
-import { useContext } from "react";
-import { CartContext } from "../context/CartContext";
+import { useState, useEffect } from "react";
+import {
+  getCart,
+  removeCartItem,
+  updateCartItem,
+} from "../services/cartService";
 import CartItem from "../components/CartItem";
 import "../css/cartPage.css";
 
 function Cart() {
-  const { cartItems, setCartItems } = useContext(CartContext);
+  const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  const userId = localStorage.getItem("user_id");
+
+  const loadCart = async () => {
+    try {
+      const data = await getCart(userId);
+      setCartItems(data.items || []);
+    } catch (error) {
+      console.error("Error loading cart:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (userId) {
+      loadCart();
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
+  // We'll connect these to the backend next
   const increaseQuantity = (id) => {
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item.cart_item_id === id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item,
       ),
     );
   };
 
   const decreaseQuantity = (id) => {
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id && item.quantity > 1
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item.cart_item_id === id && item.quantity > 1
           ? { ...item, quantity: item.quantity - 1 }
           : item,
       ),
@@ -25,17 +54,23 @@ function Cart() {
   };
 
   const removeItem = (id) => {
-    setCartItems(cartItems.filter((item) => item.id !== id));
+    setCartItems((prevItems) =>
+      prevItems.filter((item) => item.cart_item_id !== id),
+    );
   };
 
   const shipping = 1000;
 
   const subtotal = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
+    (total, item) => total + Number(item.price) * item.quantity,
     0,
   );
 
   const total = subtotal + shipping;
+
+  if (loading) {
+    return <h2>Loading cart...</h2>;
+  }
 
   return (
     <div className="cart-page">
@@ -46,11 +81,11 @@ function Cart() {
           {cartItems.length > 0 ? (
             cartItems.map((item) => (
               <CartItem
-                key={item.id}
+                key={item.cart_item_id}
                 item={item}
-                increaseQuantity={() => increaseQuantity(item.id)}
-                decreaseQuantity={() => decreaseQuantity(item.id)}
-                removeItem={() => removeItem(item.id)}
+                increaseQuantity={() => increaseQuantity(item.cart_item_id)}
+                decreaseQuantity={() => decreaseQuantity(item.cart_item_id)}
+                removeItem={() => removeItem(item.cart_item_id)}
               />
             ))
           ) : (

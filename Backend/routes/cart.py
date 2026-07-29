@@ -48,6 +48,11 @@ def get_cart(user_id):
                 "cart_item_id" : item.id,
                 "product_id" : item.product.id,
                 "product_name" : item.product.name,
+                "description" : item.product.description,
+                "category" : item.product.category,
+                "image-url" : item.product.image_url,
+                "stock": item.product.stock,
+                "size": item.size,
                 "quantity" : item.quantity,
                 "price" : str(item.product.price),
                 "subtotal" : str(subtotal)
@@ -118,6 +123,7 @@ def add_to_cart():
         user_id = data.get('user_id')
         product_id = data.get('product_id')
         quantity = data.get('quantity', 1)
+        size = data.get("size", "M")
 
         if not user_id or not product_id:
             return jsonify({
@@ -154,7 +160,8 @@ def add_to_cart():
         
         existing_item = CartItem.query.filter_by(
             cart_id=cart.id,
-            product_id=product_id
+            product_id=product_id,
+            size=size
         ).first()
 
         if existing_item:
@@ -163,7 +170,8 @@ def add_to_cart():
             new_item = CartItem(
                 cart_id = cart.id,
                 product_id = product_id,
-                quantity = quantity
+                quantity = quantity,
+                size = size
             )
             db.session.add(new_item)
 

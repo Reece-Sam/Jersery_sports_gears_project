@@ -1,9 +1,31 @@
-# Ignore virtual environment
-venv/
+# ==========================
+# Python
+# ==========================
+Backend/venv/
+Backend/__pycache__/
+Backend/*.pyc
+Backend/.env
 
-# Ignore Python cache
-__pycache__/
+# ==========================
+# Flask
+# ==========================
+Backend/instance/
+Backend/.pytest_cache/
+
+# ==========================
+# React / Vite
+# ==========================
+Frontend/node_modules/
+Frontend/dist/
+
+# ==========================
+# VS Code
+# ==========================
 .vscode/
-.env
-*.env
-*env
+
+# ==========================
+# OS files
+# ==========================
+.DS_Store
+Thumbs.db
+

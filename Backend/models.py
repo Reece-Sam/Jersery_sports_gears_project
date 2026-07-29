@@ -211,6 +211,8 @@ class CartItem(db.Model):
 
     quantity = db.Column(db.Integer, nullable=False, default=1)
 
+    size = db.Column(db.String(10), nullable=False)
+
     cart = db.relationship("Cart", backref="items")
     product = db.relationship('Product')
 

@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { loginUser } from "../services/authService";
+import { useNavigate } from "react-router-dom";
 import "../css/login.css";
+
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -12,9 +16,11 @@ function Login() {
     try {
       const data = await loginUser(email, password);
 
-      console.log(data);
+      localStorage.setItem("user_id", data.user_id);
 
-      alert("Login Successful");
+      console.log("Logged in user:", data.user_id);
+
+      navigate("/", { replace: true });
     } catch (error) {
       alert(error.message);
     }
@@ -40,7 +46,7 @@ function Login() {
         />
 
         <button type="submit">Login</button>
-      </form> 
+      </form>
     </div>
   );
 }
